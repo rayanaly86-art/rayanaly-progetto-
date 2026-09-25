@@ -1,0 +1,527 @@
+import React, { useState, useEffect, useRef } from 'react';
+
+const MY_EMAIL = "rayan.aly@example.com";
+
+const PASSION_DETAILS = {
+  "Tecnologia & E-Commerce": {
+    title: "Tecnologia, E-Commerce & Montaggio Video",
+    icon: "⚡",
+    subtitle: "Esplorare nuovi software, creare store online e produrre contenuti visivi",
+    description: `Nel mio tempo libero mi appassiona molto il mondo della tecnologia, dell'e-commerce e del digitale. Mi piace creare e montare brevi video, esplorare nuovi software e sperimentare strategie per lanciare store online in totale autonomia.`,
+    highlights: ["Montaggio Video & Content Creation", "Ricerca & Test Software Digitali", "E-Commerce Strategy & Social Media", "Automazione & Digital Marketing"]
+  },
+  "Matematica & Geometria": {
+    title: "Matematica, Geometria & Analisi Dati",
+    icon: "📐",
+    subtitle: "La logica dietro ogni grande progetto e business di successo",
+    description: `Vedo la matematica e la geometria come il linguaggio fondamentale per comprendere il mondo, analizzare i dati e risolvere problemi complessi. Sono essenziali per calcolare margini di profitto, comprendere gli algoritmi dei social e strutturare modelli logici in ingegneria.`,
+    highlights: ["Analisi Dati & Statistica", "Problem Solving Logico", "Geometria Applicata e Modelli", "Calcolo Economico & Margini"]
+  },
+  "Scienze & Ingegneria": {
+    title: "Scienze, Ingegneria PRATICA & Circuiti",
+    icon: "🔬",
+    subtitle: "Sperimentazione manuale, modelli in cartone, circuiti elettrici e motori",
+    description: `Amo mettere alla prova le mie capacità con progetti pratici e manuali: dalla costruzione di modelli e meccanismi d'ingegneria in cartone alla realizzazione di piccoli circuiti elettrici. Seguo anche con grande entusiasmo il mondo dei motori e delle auto sportive!`,
+    highlights: ["Circuiti Elettrici & Prototipazione", "Ingegneria Meccanica in Cartone", "Passione Motori & Auto Sportive", "Sperimentazione Scientifica"]
+  },
+  "Futuro ITE Tosi": {
+    title: "Percorso ITE Enrico Tosi & Progetti Futuri",
+    icon: "🏫",
+    subtitle: "Amministrazione, Finanza, Marketing & Digital Specialist",
+    description: `Per le superiori ho scelto l'ITE Enrico Tosi (indirizzo Amministrazione, Finanza e Marketing). Voglio imparare le basi dell'economia, del marketing e delle nuove tecnologie per diventare Ingegne del Marketing / Digital Specialist, lanciare brand e sviluppare imprese commerciali.`,
+    highlights: ["Economia & Diritto", "Marketing Digitale & Social Media", "Informatica & Lingue Straniere", "Spirito Imprenditoriale"]
+  }
+};
+
+function useTypewriter(text, speed = 38, startDelay = 600) {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let timeoutId;
+    let intervalId;
+
+    timeoutId = setTimeout(() => {
+      let index = 0;
+      intervalId = setInterval(() => {
+        if (index < text.length) {
+          setDisplayed(text.slice(0, index + 1));
+          index++;
+        } else {
+          setDone(true);
+          clearInterval(intervalId);
+        }
+      }, speed);
+    }, startDelay);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
+  }, [text, speed, startDelay]);
+
+  return { displayed, done };
+}
+
+export default function App() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedPill, setSelectedPill] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [pillsVisible, setPillsVisible] = useState(false);
+
+  // Canvas / Video scrub control states
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const [videoProgress, setVideoProgress] = useState(0.2);
+  const isSeekingRef = useRef(false);
+  const targetTimeRef = useRef(2);
+
+  const { displayed, done } = useTypewriter(
+    "Passionato di tecnologia, e-commerce, matematica, scienze e ingegneria. Trasformo le mie idee in progetti reali.",
+    35,
+    500
+  );
+
+  // Trigger buttons visibility after delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPillsVisible(true);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Generate high-end cybernetic particle/mesh background on canvas if video fails or acts as fallback
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Particle nodes for visual depth
+    const nodes = Array.from({ length: 45 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: Math.random() * 2 + 1
+    }));
+
+    let mouseX = width / 2;
+    let mouseY = height / 2;
+
+    const render = () => {
+      ctx.fillStyle = '#060608';
+      ctx.fillRect(0, 0, width, height);
+
+      // Subtle dynamic grid
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      const gridSize = 60;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw light glow around mouse / Scrub node
+      const gradient = ctx.createRadialGradient(
+        mouseX, mouseY, 10,
+        mouseX, mouseY, 400
+      );
+      gradient.addColorStop(0, 'rgba(56, 189, 248, 0.12)');
+      gradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.05)');
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Update and connect nodes
+      nodes.forEach((node, i) => {
+        node.x += node.vx;
+        node.y += node.vy;
+
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fill();
+
+        for (let j = i + 1; j < nodes.length; j++) {
+          const other = nodes[j];
+          const dist = Math.hypot(node.x - other.x, node.y - other.y);
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(other.x, other.y);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.15 * (1 - dist / 130)})`;
+            ctx.stroke();
+          }
+        }
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      // Mouse interactive scrubbing ratio
+      const mouseRatio = e.clientX / window.innerWidth;
+      setVideoProgress(mouseRatio);
+
+      if (videoRef.current && videoRef.current.duration) {
+        const video = videoRef.current;
+        targetTimeRef.current = mouseRatio * video.duration;
+
+        if (!isSeekingRef.current) {
+          isSeekingRef.current = true;
+          video.currentTime = targetTimeRef.current;
+        }
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  const handleSeeked = () => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      if (Math.abs(video.currentTime - targetTimeRef.current) > 0.1) {
+        video.currentTime = targetTimeRef.current;
+      } else {
+        isSeekingRef.current = false;
+      }
+    }
+  };
+
+  const copyEmail = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(MY_EMAIL);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2200);
+  };
+
+  return (
+    <div className="relative min-h-screen w-full bg-[#08080A] text-white overflow-x-hidden select-none font-sans">
+      
+      {}
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 z-0 w-full h-full object-cover pointer-events-none"
+      />
+
+      <video
+        ref={videoRef}
+        className="fixed inset-0 z-[1] w-full h-full object-cover opacity-35 mix-blend-screen pointer-events-none"
+        style={{ objectPosition: '70% center' }}
+        muted
+        playsInline
+        preload="auto"
+        onSeeked={handleSeeked}
+        src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260826_041744_63efcd78-bf7d-4039-99e2-2461e8a61903.mp4"
+      />
+
+      {/* Subtle overlay gradient */}
+      <div className="fixed inset-0 z-[2] bg-gradient-to-t from-[#08080A] via-transparent to-[#08080A]/60 pointer-events-none" />
+
+      {}
+      <header className="fixed top-0 left-0 right-0 z-20 px-5 sm:px-8 py-4 sm:py-5 flex justify-between items-center backdrop-blur-md bg-black/20 border-b border-white/5">
+        {/* Logo */}
+        <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <span className="text-[21px] sm:text-[26px] font-medium tracking-tight text-white group-hover:opacity-80 transition-opacity">
+            Rayan Aly
+          </span>
+          <span className="text-[25px] sm:text-[30px] text-sky-400 select-none animate-spin-slow">
+            ✳︎
+          </span>
+        </div>
+
+        {/* Desktop Navigation Links */}
+        <nav className="hidden md:flex items-center text-[19px] sm:text-[22px] font-light tracking-wide text-white/90">
+          <button onClick={() => setSelectedPill("Tecnologia & E-Commerce")} className="hover:opacity-60 transition-opacity">Chi Sono</button>
+          <span className="mx-1 text-white/40">,</span>
+          <button onClick={() => setSelectedPill("Scienze & Ingegneria")} className="hover:opacity-60 transition-opacity">Passioni</button>
+          <span className="mx-1 text-white/40">,</span>
+          <button onClick={() => setSelectedPill("Futuro ITE Tosi")} className="hover:opacity-60 transition-opacity">Percorso ITE</button>
+          <span className="mx-1 text-white/40">,</span>
+          <button onClick={() => setSelectedPill("Matematica & Geometria")} className="hover:opacity-60 transition-opacity">Progetti</button>
+        </nav>
+
+        {/* Desktop CTA */}
+        <button
+          onClick={copyEmail}
+          className="hidden md:inline-block text-[19px] sm:text-[22px] font-light text-white underline underline-offset-4 hover:opacity-60 transition-opacity cursor-pointer"
+        >
+          {copied ? "✓ Email Copiata!" : "Contattami"}
+        </button>
+
+        {/* Mobile Hamburger Button */}
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="md:hidden z-30 p-2 flex flex-col gap-[5px] focus:outline-none"
+          aria-label="Toggle menu"
+        >
+          <span
+            className={`w-6 h-[2px] bg-white transition-all duration-300 ${
+              mobileMenuOpen ? 'rotate-45 translate-y-[7px]' : ''
+            }`}
+          />
+          <span
+            className={`w-6 h-[2px] bg-white transition-all duration-300 ${
+              mobileMenuOpen ? 'opacity-0' : ''
+            }`}
+          />
+          <span
+            className={`w-6 h-[2px] bg-white transition-all duration-300 ${
+              mobileMenuOpen ? '-rotate-45 -translate-y-[7px]' : ''
+            }`}
+          />
+        </button>
+      </header>
+
+      {}
+      <div
+        className={`fixed inset-0 z-10 bg-black/95 backdrop-blur-xl flex flex-col justify-center px-8 gap-8 transition-all duration-300 md:hidden ${
+          mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <div className="flex flex-col gap-6 text-[30px] font-light text-white">
+          <button
+            onClick={() => { setSelectedPill("Tecnologia & E-Commerce"); setMobileMenuOpen(false); }}
+            className="text-left hover:text-sky-400 transition-colors"
+          >
+            Chi Sono
+          </button>
+          <button
+            onClick={() => { setSelectedPill("Scienze & Ingegneria"); setMobileMenuOpen(false); }}
+            className="text-left hover:text-sky-400 transition-colors"
+          >
+            Passioni & Ingegneria
+          </button>
+          <button
+            onClick={() => { setSelectedPill("Futuro ITE Tosi"); setMobileMenuOpen(false); }}
+            className="text-left hover:text-sky-400 transition-colors"
+          >
+            Percorso ITE Tosi
+          </button>
+          <button
+            onClick={() => { setSelectedPill("Matematica & Geometria"); setMobileMenuOpen(false); }}
+            className="text-left hover:text-sky-400 transition-colors"
+          >
+            Matematica & Progetti
+          </button>
+          <hr className="border-white/10 my-2" />
+          <button
+            onClick={(e) => { copyEmail(e); setMobileMenuOpen(false); }}
+            className="text-left text-sky-400 underline underline-offset-4"
+          >
+            {copied ? "✓ Email Copiata!" : "Invia una Mail"}
+          </button>
+        </div>
+      </div>
+
+      {}
+      <main className="relative z-[3] min-h-screen flex flex-col justify-end pb-16 md:justify-center md:pb-0 px-5 sm:px-8 md:px-12 pt-24 max-w-4xl mx-auto">
+        <div className="max-w-2xl relative">
+
+          {/* Blurred Intro Label */}
+          <div className="pointer-events-none select-none mb-4 sm:mb-6">
+            <p className="text-[20px] sm:text-[24px] md:text-[28px] font-normal leading-snug text-white/90 blur-[0.6px] tracking-wide">
+              Ciao, benvenuto sul mio sito,
+              <br />
+              <span className="text-white font-medium drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                Sono Rayan Aly — Future Tech & Digital Specialist
+              </span>
+            </p>
+          </div>
+
+          {/* Typewriter Interactive Text */}
+          <div className="min-h-[70px] sm:min-h-[80px] mb-6 sm:mb-8">
+            <p className="text-[19px] sm:text-[23px] md:text-[26px] font-light leading-snug text-white/95">
+              {displayed}
+              {!done && (
+                <span className="inline-block w-[2px] h-[1.1em] bg-sky-400 align-middle ml-[3px] animate-pulse" />
+              )}
+            </p>
+          </div>
+
+          {}
+          <div
+            className={`flex flex-wrap gap-2 transition-all duration-700 transform ${
+              pillsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            {Object.keys(PASSION_DETAILS).map((key) => (
+              <button
+                key={key}
+                onClick={() => setSelectedPill(key)}
+                className="inline-flex items-center justify-center bg-white text-black border border-white/20 rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-2 font-medium hover:bg-sky-400 hover:text-black hover:scale-105 active:scale-95 transition-all duration-200 shadow-lg cursor-pointer"
+              >
+                {PASSION_DETAILS[key].icon} <span className="ml-2">{key}</span>
+              </button>
+            ))}
+
+            {/* Email Contact Pill */}
+            <button
+              onClick={copyEmail}
+              className="inline-flex items-center justify-center bg-transparent text-white border border-white/40 rounded-full text-[13px] sm:text-[15px] px-4 sm:px-5 py-2 font-light hover:bg-white hover:text-black hover:border-white transition-all duration-200 gap-2 cursor-pointer backdrop-blur-sm"
+            >
+              <span>{copied ? "Copiato!" : "Invia un saluto"}</span>
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-80"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Interactive Scrub Helper Indicator */}
+          <div className="mt-12 flex items-center gap-3 text-xs text-white/40 font-mono">
+            <div className="w-12 h-[1px] bg-white/20 relative overflow-hidden">
+              <div
+                className="absolute top-0 bottom-0 bg-sky-400 w-full transition-all duration-75"
+                style={{ transform: `translateX(${(videoProgress - 1) * 100}%)` }}
+              />
+            </div>
+            <span>MUOVI IL MOUSE PER INTERAGIRE CON LO Sfondo</span>
+          </div>
+
+        </div>
+      </main>
+
+      {}
+      {selectedPill && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md animate-fade-in"
+          onClick={() => setSelectedPill(null)}
+        >
+          <div
+            className="bg-[#121216] border border-white/15 rounded-3xl p-6 sm:p-8 max-w-lg w-full text-white shadow-2xl relative overflow-hidden transform transition-all animate-scale-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Background ambient glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl p-2 bg-white/5 rounded-2xl border border-white/10">
+                  {PASSION_DETAILS[selectedPill].icon}
+                </span>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                    {PASSION_DETAILS[selectedPill].title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-sky-400 font-medium">
+                    {PASSION_DETAILS[selectedPill].subtitle}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedPill(null)}
+                className="text-white/50 hover:text-white p-2 text-xl rounded-full hover:bg-white/10 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Body Description */}
+            <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-6 font-light">
+              {PASSION_DETAILS[selectedPill].description}
+            </p>
+
+            {/* Highlights list */}
+            <div className="space-y-2 mb-6">
+              <p className="text-xs uppercase tracking-wider text-white/40 font-semibold">Punti chiave:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {PASSION_DETAILS[selectedPill].highlights.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl text-xs sm:text-sm text-white/90 border border-white/5">
+                    <span className="text-sky-400">✦</span>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex justify-between items-center pt-4 border-t border-white/10">
+              <span className="text-xs text-white/40 font-mono">Portfolio • Rayan Aly</span>
+              <button
+                onClick={() => setSelectedPill(null)}
+                className="bg-white text-black font-medium text-xs sm:text-sm px-5 py-2.5 rounded-full hover:bg-sky-400 transition-colors"
+              >
+                Chiudi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Footer minimal info */}
+      <footer className="fixed bottom-4 left-5 sm:left-8 z-10 text-[11px] text-white/30 font-mono tracking-wider uppercase pointer-events-none">
+        © Rayan Aly — Future Tech & Business
+      </footer>
+
+      {/* Custom Styles */}
+      <style>{`
+        @keyframes spinSlow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+          animation: spinSlow 18s linear infinite;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.25s ease-out forwards;
+        }
+        @keyframes scaleUp {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        .animate-scale-up {
+          animation: scaleUp 0.25s ease-out forwards;
+        }
+      `}</style>
+    </div>
+  );
+}
